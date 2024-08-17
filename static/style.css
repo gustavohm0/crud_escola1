@@ -48,8 +48,6 @@ a:hover {
     text-decoration: underline;
 }
 
-/* static/style.css */
-
 .button, .button-edit, .button-delete {
     background-color: #007BFF;
     color: #fff;

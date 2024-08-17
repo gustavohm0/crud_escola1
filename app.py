@@ -4,14 +4,14 @@ from flasgger import Swagger
 import os
 from peewee import MySQLDatabase
 
-DATABASE_URL = os.getenv('JAWSDB_URL')  # Ou a variável correspondente
+DATABASE_URL = os.getenv('JAWSDB_URL')  
 
 db = MySQLDatabase(
-    'q7iglsidj32el9k1',  # Nome do banco de dados
-    user='ckk6h3o3gb5v2ezc',  # Nome de usuário
-    password='eysfvw1pzsc618nv',  # Senha
-    host='alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  # Host
-    port=3306  # Porta
+    'q7iglsidj32el9k1',  
+    user='ckk6h3o3gb5v2ezc',  
+    password='eysfvw1pzsc618nv',
+    host='alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+    port=3306
 )
 
 

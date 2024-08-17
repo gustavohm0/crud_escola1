@@ -11,7 +11,7 @@ db = MySQLDatabase(
     user='ckk6h3o3gb5v2ezc',  
     password='eysfvw1pzsc618nv',
     host='alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
-    port=3306
+    port=3306 
 )
 
 
@@ -23,7 +23,12 @@ def index():
     alunos = Aluno.select()
     return render_template('index.html', alunos=alunos)
 
-@app.route('/alunos', methods=['GET', 'POST'])
+@app.route('/apidocs')
+def apidocs():
+    """Swagger API Documentation"""
+    return render_template('swagger_ui.html')
+
+@app.route('/alunos', methods=['GET'])
 def listar_alunos():
     """
     Lista ou adiciona alunos.
@@ -71,7 +76,7 @@ def listar_alunos():
     alunos = Aluno.select()
     return render_template('index.html', alunos=alunos)
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/create', methods=['POST'])
 def create():
     """
     Cria um novo aluno.
@@ -107,7 +112,7 @@ def create():
     
     return render_template('create.html')
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@app.route('/update/<int:id>', methods=['POST'])
 def update(id):
     """
     Atualiza as informações de um aluno.
@@ -143,7 +148,7 @@ def update(id):
     
     return render_template('update.html', aluno=aluno)
 
-@app.route('/delete/<int:id>', methods=['POST'])
+@app.route('/delete/<int:id>', methods=['DELETE'])
 def delete(id):
     """
     Deleta um aluno.

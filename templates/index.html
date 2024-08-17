@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Alunos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Lista de Alunos</h1>
+    </header>
+
+    <div class="container">
+        <br>
+        <a href="{{ url_for('create') }}" class="button">Adicionar Novo Aluno</a>
+        <ul class="lista-alunos">
+            {% for aluno in alunos %}
+                <li>
+                    <strong>ID:</strong> {{ aluno.id }} - 
+                    <strong>Nome:</strong> {{ aluno.nome }} - 
+                    <strong>Idade:</strong> {{ aluno.idade }} - 
+                    <strong>Nota 1º Semestre:</strong> {{ aluno.nota_primeiro_semestre }} - 
+                    <strong>Nota 2º Semestre:</strong> {{ aluno.nota_segundo_semestre }} - 
+                    <strong>Nome do Professor:</strong> {{ aluno.nome_professor }} - 
+                    <strong>Número da Sala:</strong> {{ aluno.numero_sala }} - 
+                    <a href="{{ url_for('update', id=aluno.id) }}" class="button-edit">Editar</a> - 
+                    <form action="{{ url_for('delete', id=aluno.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="button-delete">Deletar</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

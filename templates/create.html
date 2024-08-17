@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Aluno</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Adicionar Novo Aluno</h1>
+    </header>
+
+    <div class="container">
+        <form action="{{ url_for('create') }}" method="post">
+            <input type="text" name="nome" placeholder="Nome" required>
+            <input type="number" name="idade" placeholder="Idade" required>
+            <input type="number" step="0.01" name="nota_primeiro_semestre" placeholder="Nota 1º Semestre" required>
+            <input type="number" step="0.01" name="nota_segundo_semestre" placeholder="Nota 2º Semestre" required>
+            <input type="text" name="nome_professor" placeholder="Nome do Professor" required>
+            <input type="number" name="numero_sala" placeholder="Número da Sala" required>
+            <button type="submit">Adicionar</button>
+        </form>
+    </div>
+</body>
+</html>

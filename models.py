@@ -1,7 +1,14 @@
 from peewee import *
 import pymysql
 
-db = MySQLDatabase('escola', user='root', password='1234', host='127.0.0.1', port=3306)
+db = MySQLDatabase(
+    'q7iglsidj32el9k1',  
+    user='ckk6h3o3gb5v2ezc',
+    password='eysfvw1pzsc618nv',  
+    host='alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  
+    port=3306  
+)
+
 
 class Aluno(Model):
     nome = CharField(max_length=100)

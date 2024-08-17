@@ -1,103 +1,193 @@
-from flask import Flask, request, jsonify, render_template
-from peewee import *
-from swagger_config import create_swagger
+from flask import Flask, render_template, request, redirect, url_for
+from models import Aluno, db
+from flasgger import Swagger
 
 app = Flask(__name__)
-
-# Configuração do banco de dados
-db = MySQLDatabase('escola', user='root', password='1234', host='127.0.0.1', port=3306)
-
-class Aluno(Model):
-    nome = CharField()
-    idade = IntegerField()
-    nota_primeiro_semestre = FloatField()
-    nota_segundo_semestre = FloatField()
-    nome_professor = CharField()
-    numero_sala = IntegerField()
-
-    class Meta:
-        database = db
-
-# Cria as tabelas se ainda não existirem
-db.connect()
-db.create_tables([Aluno])
-
-# Configura o Swagger usando o arquivo separado
-swagger = create_swagger(app)
+swagger = Swagger(app)
 
 @app.route('/')
 def index():
-    """
-    Página inicial que mostra a lista de alunos.
-    ---
-    responses:
-      200:
-        description: Página inicial
-    """
-    return render_template('index.html')
-
-@app.route('/alunos', methods=['GET'])
-def get_alunos():
-    """
-    Recupera a lista de alunos
-    ---
-    responses:
-      200:
-        description: Lista de alunos
-        schema:
-          type: array
-          items:
-            $ref: '#/definitions/Aluno'
-    """
     alunos = Aluno.select()
-    return jsonify([aluno_to_dict(aluno) for aluno in alunos])
+    return render_template('index.html', alunos=alunos)
 
-@app.route('/alunos', methods=['POST'])
-def add_aluno():
+@app.route('/alunos', methods=['GET', 'POST'])
+def listar_alunos():
     """
-    Adiciona um novo aluno
+    Lista ou adiciona alunos.
     ---
-    parameters:
-      - name: aluno
-        in: body
-        required: true
-        schema:
-          id: Aluno
-          properties:
-            nome:
-              type: string
-            idade:
-              type: integer
-            nota_primeiro_semestre:
-              type: number
-              format: float
-            nota_segundo_semestre:
-              type: number
-              format: float
-            nome_professor:
-              type: string
-            numero_sala:
-              type: integer
-    responses:
-      201:
-        description: Aluno criado com sucesso
-        schema:
-          $ref: '#/definitions/Aluno'
+    get:
+      description: Lista todos os alunos
+      responses:
+        200:
+          description: Lista de alunos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aluno'
+    post:
+      description: Adiciona um novo aluno
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Aluno'
+      responses:
+        201:
+          description: Aluno criado com sucesso
     """
-    data = request.get_json()
-    novo_aluno = Aluno.create(**data)
-    return jsonify(aluno_to_dict(novo_aluno)), 201
+    if request.method == 'POST':
+        nome = request.form['nome']
+        idade = request.form['idade']
+        nota_primeiro_semestre = request.form['nota_primeiro_semestre']
+        nota_segundo_semestre = request.form['nota_segundo_semestre']
+        nome_professor = request.form['nome_professor']
+        numero_sala = request.form['numero_sala']
+        
+        Aluno.create(
+            nome=nome,
+            idade=idade,
+            nota_primeiro_semestre=nota_primeiro_semestre,
+            nota_segundo_semestre=nota_segundo_semestre,
+            nome_professor=nome_professor,
+            numero_sala=numero_sala
+        )
+        return redirect(url_for('listar_alunos'))
+    
+    alunos = Aluno.select()
+    return render_template('index.html', alunos=alunos)
 
-def aluno_to_dict(aluno):
-    return {
-        'id': aluno.id,
-        'nome': aluno.nome,
-        'idade': aluno.idade,
-        'nota_primeiro_semestre': aluno.nota_primeiro_semestre,
-        'nota_segundo_semestre': aluno.nota_segundo_semestre,
-        'nome_professor': aluno.nome_professor,
-        'numero_sala': aluno.numero_sala
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    """
+    Cria um novo aluno.
+    ---
+    post:
+      description: Cria um novo aluno
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Aluno'
+      responses:
+        201:
+          description: Aluno criado com sucesso
+    """
+    if request.method == 'POST':
+        nome = request.form['nome']
+        idade = request.form['idade']
+        nota_primeiro_semestre = request.form['nota_primeiro_semestre']
+        nota_segundo_semestre = request.form['nota_segundo_semestre']
+        nome_professor = request.form['nome_professor']
+        numero_sala = request.form['numero_sala']
+        
+        Aluno.create(
+            nome=nome,
+            idade=idade,
+            nota_primeiro_semestre=nota_primeiro_semestre,
+            nota_segundo_semestre=nota_segundo_semestre,
+            nome_professor=nome_professor,
+            numero_sala=numero_sala
+        )
+        return redirect(url_for('listar_alunos'))
+    
+    return render_template('create.html')
+
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    """
+    Atualiza as informações de um aluno.
+    ---
+    post:
+      description: Atualiza as informações de um aluno
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do aluno a ser atualizado
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Aluno'
+      responses:
+        200:
+          description: Aluno atualizado com sucesso
+    """
+    aluno = Aluno.get_or_none(Aluno.id == id)
+    if request.method == 'POST':
+        aluno.nome = request.form['nome']
+        aluno.idade = request.form['idade']
+        aluno.nota_primeiro_semestre = request.form['nota_primeiro_semestre']
+        aluno.nota_segundo_semestre = request.form['nota_segundo_semestre']
+        aluno.nome_professor = request.form['nome_professor']
+        aluno.numero_sala = request.form['numero_sala']
+        aluno.save()
+        return redirect(url_for('listar_alunos'))
+    
+    return render_template('update.html', aluno=aluno)
+
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    """
+    Deleta um aluno.
+    ---
+    post:
+      description: Deleta um aluno pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do aluno a ser deletado
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Aluno deletado com sucesso
+    """
+    aluno = Aluno.get_or_none(Aluno.id == id)
+    if aluno:
+        aluno.delete_instance()
+    return redirect(url_for('listar_alunos'))
+
+swagger.definition('Aluno', {
+    'type': 'object',
+    'properties': {
+        'id': {
+            'type': 'integer',
+            'description': 'ID do aluno'
+        },
+        'nome': {
+            'type': 'string',
+            'description': 'Nome do aluno'
+        },
+        'idade': {
+            'type': 'integer',
+            'description': 'Idade do aluno'
+        },
+        'nota_primeiro_semestre': {
+            'type': 'number',
+            'format': 'float',
+            'description': 'Nota do primeiro semestre'
+        },
+        'nota_segundo_semestre': {
+            'type': 'number',
+            'format': 'float',
+            'description': 'Nota do segundo semestre'
+        },
+        'nome_professor': {
+            'type': 'string',
+            'description': 'Nome do professor'
+        },
+        'numero_sala': {
+            'type': 'integer',
+            'description': 'Número da sala'
+        }
     }
+})
 
 if __name__ == '__main__':
     app.run(debug=True)

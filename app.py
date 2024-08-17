@@ -1,6 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for
 from models import Aluno, db
 from flasgger import Swagger
+import os
+from peewee import MySQLDatabase
+
+DATABASE_URL = os.getenv('JAWSDB_URL')  # Ou a variável correspondente
+
+db = MySQLDatabase(
+    'q7iglsidj32el9k1',  # Nome do banco de dados
+    user='ckk6h3o3gb5v2ezc',  # Nome de usuário
+    password='eysfvw1pzsc618nv',  # Senha
+    host='alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  # Host
+    port=3306  # Porta
+)
+
 
 app = Flask(__name__)
 swagger = Swagger(app)
